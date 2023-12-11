@@ -1,1 +1,5 @@
-export { assert } from "https://deno.land/std/testing/asserts.ts";
+export {
+  assert,
+  assertEquals,
+  assertFalse,
+} from "https://deno.land/std/assert/mod.ts";

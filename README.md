@@ -12,11 +12,10 @@
   </a>
 </p>
 
-
 kill-port is available through:
+
 - https://nest.land/package/kill-port
 - https://deno.land/x/kill_port
-
 
 ## Usage
 

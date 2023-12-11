@@ -11,7 +11,6 @@ interface KillPortOptions {
  * Example:
  *
  *     await killPort(8082);
- *
  */
 export async function killPort(
   port: number,
@@ -43,13 +42,12 @@ async function getPidPortWindows(
   port: number,
   options: KillPortOptions,
 ): Promise<number | null> {
-  const cmd = Deno.run({
-    cmd: ["cmd", "/c", "netstat -a -n -o | findstr", `${port}`],
-    stdout: "piped",
-    stderr: "piped",
+  const cmd = new Deno.Command("cmd", {
+    args: ["/c", "netstat -a -n -o | findstr", `${port}`],
   });
+  const { stdout } = await cmd.output();
 
-  const output = new TextDecoder("utf-8").decode(await cmd.output());
+  const output = new TextDecoder("utf-8").decode(stdout);
 
   const lines = output.split("\n");
   const lineWithLocalPortRegEx = new RegExp(
@@ -60,21 +58,15 @@ async function getPidPortWindows(
     line.match(lineWithLocalPortRegEx)
   );
 
-  const pid = linesWithLocalPort[0].trim().split(/[\s, ]+/)[3];
-
+  const pid = linesWithLocalPort[0].trim().split(/[\s, ]+/)[4];
   return pid ? parseInt(pid) : null;
 }
 
 async function killProcessWindows(pid: number): Promise<void> {
-  const cmd = Deno.run({
-    cmd: ["cmd", "/c", `taskkill /PID ${pid} /F`],
-    stdout: "piped",
-    stderr: "piped",
+  const cmd = new Deno.Command("cmd", {
+    args: ["cmd", "/c", `taskkill /PID ${pid} /F`],
   });
-
   await cmd.output();
-
-  cmd.close();
 }
 
 async function handleKillPort(
@@ -82,13 +74,10 @@ async function handleKillPort(
   options: KillPortOptions,
 ): Promise<number | null> {
   const pid = await getPidPort(port, options);
-
   if (!pid) {
     return null;
   }
-
   await killProcess(pid);
-
   return pid;
 }
 
@@ -96,27 +85,14 @@ async function getPidPort(
   port: number,
   options: KillPortOptions,
 ): Promise<number> {
-  const cmd = Deno.run({
-    cmd: ["fuser", `${port}/${options.protocol}`],
-    stdout: "piped",
-    stderr: "piped",
+  const cmd = new Deno.Command("fuser", {
+    args: [`${port}/${options.protocol}`],
   });
-
-  const output = await cmd.output();
-
-  cmd.close();
-
-  return parseInt((new TextDecoder().decode(output)).trim());
+  const { stdout } = await cmd.output();
+  return parseInt(new TextDecoder().decode(stdout).trim());
 }
 
 async function killProcess(pid: number): Promise<void> {
-  const cmd = Deno.run({
-    cmd: ["kill", "-9", `${pid}`],
-    stdout: "piped",
-    stderr: "piped",
-  });
-
+  const cmd = new Deno.Command("kill", { args: ["-9", `${pid}`] });
   await cmd.output();
-
-  cmd.close();
 }
