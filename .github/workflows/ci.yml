@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  ci:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -15,12 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup Deno
-        uses: denolib/setup-deno@master
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
         with:
-          deno-version: '1.x'
+          deno-version: v1.x
 
       - name: Print deno version
         run: deno --version

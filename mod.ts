@@ -95,4 +95,5 @@ async function getPidPort(
 async function killProcess(pid: number): Promise<void> {
   const cmd = new Deno.Command("kill", { args: ["-9", `${pid}`] });
   await cmd.output();
+  await new Promise((resolve) => setTimeout(resolve, 10)); // Wait 10ms since the process is not killed immediately
 }

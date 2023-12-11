@@ -11,14 +11,14 @@ Deno.test("it should kill the port process", async () => {
     ],
   }).spawn();
   await new Promise((resolve) => setTimeout(resolve, 1000)); // give it a second to start
-  assertFalse(isAddrFree(port));
+  assertFalse(isAddrFree(port), `Port ${port} should be in use!`);
 
   // Act
   const killedPid = await killPort(9999);
 
   // Validate
-  assertEquals(killedPid, process.pid);
-  assert(isAddrFree(port));
+  assertEquals(killedPid, process.pid, "Should have killed the process!");
+  assert(isAddrFree(port), `Port ${port} should be free!`);
 });
 
 function isAddrFree(port: number): boolean {
