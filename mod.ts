@@ -58,6 +58,8 @@ async function getPidPortWindows(
     line.match(lineWithLocalPortRegEx)
   );
 
+  if (lines.length === 0) return null;
+
   const pid = linesWithLocalPort[0].trim().split(/[\s, ]+/)[4];
   return pid ? parseInt(pid) : null;
 }
