@@ -6,9 +6,7 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
   repository_dispatch:
-    types:
-      - test
-      
+    types: [test_result]
 
 jobs:
   ci:
